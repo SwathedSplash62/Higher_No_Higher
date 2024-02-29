@@ -2,6 +2,32 @@ import math
 import random
 
 
+def round_check(question):
+    valid = False
+    while not valid:
+        error = "Please enter an integer that is 1 or more"
+
+        to_check = input(question)
+
+        if to_check == "":
+            return ""
+
+        try:
+
+            # ask user to enter a number
+            response = int(to_check)
+
+            # checks number is more than one
+            if response < 1:
+                print(error)
+            # Outputs error if input is invalid
+            else:
+                return response
+
+        except ValueError:
+            print(error)
+
+
 def string_checker(question, valid_ans):
     error = f"Please enter a valid option from the following list: {valid_ans}"
 
@@ -21,7 +47,8 @@ def string_checker(question, valid_ans):
         print()
 
 
-def num_check(question, low=None, exit_code=None, high=None):
+def int_check(question, low=None, exit_code=None, high=None):
+
     # if any integer is allowed. . .
     if low is None and high is None:
         error = "Please enter an integer"
@@ -37,8 +64,9 @@ def num_check(question, low=None, exit_code=None, high=None):
     while True:
         response = input(question).lower()
 
-        if response == exit_code:
+        if response == "quit":
             return response
+
 
         try:
             response = int(response)
@@ -48,7 +76,7 @@ def num_check(question, low=None, exit_code=None, high=None):
                 print(error)
 
             # is more than low num
-            elif high is not None and respose > high:
+            elif high is not None and response > high:
                 print(error)
 
             # if valid then return
@@ -105,13 +133,13 @@ def calc_guesses(low, high):
 
 # what the game is supposed to be
 mode = "regular"
-
 rounds_played = 0
-rounds_tied = 0
-rounds_lost = 0
+feedback = ""
+end_game = "no"
 
 yes_no_list = ['yes', 'no']
 game_history = []
+all_scores = []
 # Title
 statement_generator("Higher Lower", "👆👇")
 
@@ -119,37 +147,28 @@ statement_generator("Higher Lower", "👆👇")
 want_instructions = string_checker("Do you want to see the instructions?", yes_no_list)
 if want_instructions == "yes":
     instructions()
-# Guessing Loop
-
-# replace the number b;pw with a random number between high / low values
-secret = 7
-
-# parameters that already exist in base game
-low_num = 0
-high_num = 10
-guesses_allowed = 5
-
-# set guesses, you'll have zero at the start of each round
-guesses_used = 0
-already_guessed = []
-
-
-guess = ""
 
 # Ask user for number of rounds
-num_rounds = num_check("How many rounds would you like? Push <enter> for ⌚️infinite mode⌚️: ", low=1, exit_code=" ")
+num_rounds = round_check("How many rounds would you like? Push <enter> for ⌚️infinite mode⌚️: ")
 
 if num_rounds == "":
     mode = "infinite"
-    num_rounds = 5
+    num_rounds = 99999999999999999999999999999999999999999
 
-low_num = num_check("Low Number? ")
-print(f"You chose a low number of {low_num}")
+# ask user if they want to change the default game number range '
+default_params = ("Do you want to use the default game parameters? ", yes_no_list)
+if default_params == "yes":
+    low_num = 0
+    high_num = 10
 
-high_num = num_check("High Number? ", low=1)
-print(f"You chose a high number of {high_num}")
+# allow user to choose the high/low num
+else:
+    low_num = int_check("Low Number? ")
+    print(f"You chose a low number of {low_num}")
+    high_num = int_check("High Number? ", low=1)
+    print(f"You chose a high number of {high_num}")
+
 guesses_allowed = calc_guesses(low_num, high_num)
-
 # game loops ends here
 while rounds_played < num_rounds:
 
@@ -161,59 +180,81 @@ while rounds_played < num_rounds:
 
     print(rounds_heading)
 
-    comp_choice = random.choice(rps_list[:-1])
+    # round starts here
+    # set stuff to zero at the start of round
+    guesses_used = 0
+    already_guessed = []
 
-    # RPS
-    user_choice = string_checker("Choose: ", rps_list)
-    print(f"you chose, {user_choice}  ")
+    # Choose the right number between the high and low num
+    secret = random.randint(low_num, high_num)
 
-    # alf-f4
-    if user_choice == "quit":
-        break
-while guess !=secret and guesses_used < guesses_allowed:
+    guess = ""
 
-    # ask user to guess
-    guess = int(input("Guess: "))
+    while guess != secret and guesses_used < guesses_allowed:
 
-    # check they don't want to quit
-    if guess == "quit":
-        end_game = "yes"
-        break
+        # ask user to guess
+        guess = int_check("Guess: ")
 
-    # check that the guess is not a dupe
-    if guess in already_guessed:
-        print(f"You've already guessed {guess}. You've *still used {guesses_used} / {guesses_allowed} guesses")
-        continue
+        # check they don't want to quit
+        if guess == "quit":
+            end_game = "yes"
+            break
 
-    # if guess wasn't a dupe add it to the 'already guessed' list
-    else:
-        already_guessed.append(guess)
+        # check that the guess is not a dupe
+        if guess in already_guessed:
+            print(f"You've already guessed {guess}. You've *still* used {guesses_used} / {guesses_allowed} guesses")
+            continue
 
-    # adds one to the number of guesses used
-    guesses_used += 1
-
-    # if have guesses left
-    if guess < secret and guesses_used < guesses_allowed:
-        feedback = f"Too low, please try a higher number. You've used {guesses_used} / {guesses_allowed} guesses"
-    elif guess > secret and guesses_used < guesses_allowed:
-        feedback = f"Too high, please try a lower number. You've used {guesses_used} / {guesses_allowed} guesses"
-
-    elif guess == secret:
-
-        if guesses_used == 1:
-            feedback = "Damn, first try"
-        elif guesses_used == guesses_allowed:
-            feedback = f"Good, you finally got it in {guesses_used} guesses"
+        # if guess wasn't a dupe add it to the 'already guessed' list
         else:
-            feedback = f"Congrats, you got it in {guesses_used} guesses"
+            already_guessed.append(guess)
 
-    else:
-        feedback = "You have lost, get luckier"
+        # adds one to the number of guesses used
+        guesses_used += 1
 
-    print(feedback)
+        # if you have guesses left
+        if guess < secret and guesses_used < guesses_allowed:
+            feedback = f"Too low, please try a higher number. You've used {guesses_used} / {guesses_allowed} guesses"
+        elif guess > secret and guesses_used < guesses_allowed:
+            feedback = f"Too high, please try a lower number. You've used {guesses_used} / {guesses_allowed} guesses"
+            if guesses_used == guesses_allowed - 1:
+                print("You have one guess left")
 
-    if guesses_used == guesses_allowed -1:
-        print("You have one guess left")
+        elif guess == secret:
+
+            if guesses_used == 1:
+                feedback = "Damn, first try"
+                rounds_played += 1
+            elif guesses_used == guesses_allowed:
+                feedback = f"Good, you finally got it in {guesses_used} guesses"
+                rounds_played += 1
+            else:
+                feedback = f"Congrats, you got it in {guesses_used} guesses"
+                rounds_played += 1
+
+        else:
+            feedback = "You have lost, get luckier"
+            rounds_played += 1
+
+        print(feedback)
+
+if rounds_played > 0:
+    # Behol, stats
+    all_scores.sort()
+    best_score = all_scores[0]
+    worst_score = all_scores[-1]
+    average_score = sum(all_scores) / len(all_scores)
+
+    # Output stats
+    print("📈📈📈 Game Statistics 📈📈📈")
+    print(
+        f"Best: {best_score} | Worst: {worst_score} | Average: {average_score:.2f}")
+    print()
+
+    see_history = ("Do you want to see your game history? ", yes_no_list)
+    if see_history == "yes":
+        for item in see_history:
+            print()
 # para
 
 print("   Thank you for playing")
