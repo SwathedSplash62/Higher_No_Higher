@@ -48,8 +48,8 @@ def string_checker(question, valid_ans):
 
 
 def int_check(question, low=None, exit_code=None, high=None):
-
     # if any integer is allowed. . .
+
     if low is None and high is None:
         error = "Please enter an integer"
 
@@ -62,13 +62,17 @@ def int_check(question, low=None, exit_code=None, high=None):
         error = f"Please enter an integer that is between {low} and {high} inclusive"
 
     while True:
+
         response = input(question).lower()
 
         if response == "quit":
             return response
 
-
         try:
+
+            if response == exit_code:
+                return response
+
             response = int(response)
 
             # if too low
@@ -136,7 +140,7 @@ mode = "regular"
 rounds_played = 0
 feedback = ""
 end_game = "no"
-
+guess = 0
 yes_no_list = ['yes', 'no']
 game_history = []
 all_scores = []
@@ -160,7 +164,7 @@ default_params = ("Do you want to use the default game parameters? ", yes_no_lis
 if default_params == "yes":
     low_num = 0
     high_num = 10
-
+    guess = 0
 # allow user to choose the high/low num
 else:
     low_num = int_check("Low Number? ")
@@ -171,6 +175,10 @@ else:
 guesses_allowed = calc_guesses(low_num, high_num)
 # game loops ends here
 while rounds_played < num_rounds:
+
+    if guess == "quit":
+        end_game = "yes"
+        break
 
     # rounds based on mode
     if mode == "infinite":
@@ -187,6 +195,7 @@ while rounds_played < num_rounds:
 
     # Choose the right number between the high and low num
     secret = random.randint(low_num, high_num)
+    print(f"Spoiler alert: {secret}")
 
     guess = ""
 
@@ -225,12 +234,18 @@ while rounds_played < num_rounds:
             if guesses_used == 1:
                 feedback = "Damn, first try"
                 rounds_played += 1
+                all_scores.append(guesses_used)
+                game_history.append(feedback)
             elif guesses_used == guesses_allowed:
                 feedback = f"Good, you finally got it in {guesses_used} guesses"
                 rounds_played += 1
+                all_scores.append(guesses_used)
+                game_history.append(feedback)
             else:
                 feedback = f"Congrats, you got it in {guesses_used} guesses"
                 rounds_played += 1
+                all_scores.append(guesses_used)
+                game_history.append(feedback)
 
         else:
             feedback = "You have lost, get luckier"
@@ -239,7 +254,8 @@ while rounds_played < num_rounds:
         print(feedback)
 
 if rounds_played > 0:
-    # Behol, stats
+
+    # Behold, stats
     all_scores.sort()
     best_score = all_scores[0]
     worst_score = all_scores[-1]
@@ -251,10 +267,14 @@ if rounds_played > 0:
         f"Best: {best_score} | Worst: {worst_score} | Average: {average_score:.2f}")
     print()
 
-    see_history = ("Do you want to see your game history? ", yes_no_list)
+    see_history = string_checker("Do you want to see your game history? ", yes_no_list)
     if see_history == "yes":
-        for item in see_history:
-            print()
+        for item in game_history:
+            print(item)
+
+else:
+    "..."
+
 # para
 
 print("   Thank you for playing")
