@@ -110,16 +110,15 @@ def instructions():
     print('''
 To begin, choose the number of rounds (or press <enter> for infinite mode).
 
-Then play against the computer. YOu can choose between R (rock), P (paper) or S (scissors).
+You will then chose a lower and higher number (inclusive) that will contain your secret number 
 
-The rules are as follows:
-o Paper beats rock
-o Rock beats scissors
-o Scissors beats paper
+You will then try to guess the number while the computer will give you hints for each guess
+
+You will receive statistics on your guesses used and will be able to see your game history at the end of the game 
 
 Type <quit> to end the game at anytime.
 
-💀💀💀Good Luck💀💀💀
+🎂🎂🎂Good Luck🎂🎂🎂
 ''')
     print()
     return ""
@@ -157,7 +156,7 @@ num_rounds = round_check("How many rounds would you like? Push <enter> for ⌚�
 
 if num_rounds == "":
     mode = "infinite"
-    num_rounds = 99999999999999999999999999999999999999999
+    num_rounds = 5
 
 # ask user if they want to change the default game number range '
 default_params = ("Do you want to use the default game parameters? ", yes_no_list)
@@ -175,6 +174,9 @@ else:
 guesses_allowed = calc_guesses(low_num, high_num)
 # game loops ends here
 while rounds_played < num_rounds:
+
+    if mode == "infinite":
+        num_rounds += 1
 
     if guess == "quit":
         end_game = "yes"
@@ -195,7 +197,6 @@ while rounds_played < num_rounds:
 
     # Choose the right number between the high and low num
     secret = random.randint(low_num, high_num)
-    print(f"Spoiler alert: {secret}")
 
     guess = ""
 
