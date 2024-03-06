@@ -48,6 +48,8 @@ def string_checker(question, valid_ans):
 
 
 def int_check(question, low=None, exit_code=None, high=None):
+
+
     # if any integer is allowed. . .
 
     if low is None and high is None:
@@ -62,11 +64,7 @@ def int_check(question, low=None, exit_code=None, high=None):
         error = f"Please enter an integer that is between {low} and {high} inclusive"
 
     while True:
-
         response = input(question).lower()
-
-        if response == "quit":
-            return response
 
         try:
 
@@ -166,10 +164,10 @@ if default_params == "yes":
     guess = 0
 # allow user to choose the high/low num
 else:
-    low_num = int_check("Low Number? ")
+    low_num = int_check("Low Number? ",exit_code="quit")
     print(f"You chose a low number of {low_num}")
-    high_num = int_check("High Number? ", low=1)
-    print(f"You chose a high number of {high_num}")
+    high_num = int_check("High Number? ",exit_code="quit", low=low_num+1)
+    print(f"You chose a high number of {high_num} ")
 
 guesses_allowed = calc_guesses(low_num, high_num)
 # game loops ends here
@@ -203,7 +201,7 @@ while rounds_played < num_rounds:
     while guess != secret and guesses_used < guesses_allowed:
 
         # ask user to guess
-        guess = int_check("Guess: ")
+        guess = int_check("Guess: ", low=low_num, high=high_num, exit_code="quit")
 
         # check they don't want to quit
         if guess == "quit":
