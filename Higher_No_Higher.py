@@ -249,6 +249,7 @@ while rounds_played < num_rounds:
         else:
             feedback = "You have lost, get luckier"
             rounds_played += 1
+            game_history.append(feedback)
 
         print(feedback)
 
